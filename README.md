@@ -65,38 +65,37 @@ The architecture separates the application into Frontend, Backend, and Database 
 ## 🏗️ System Architecture
 
 ```text
-                        Users
-                          │
-                          ▼
 
-                     Route 53
-                          │
-                          ▼
+                                      Users
+                                        │
+                                        ▼
 
-             Application Load Balancer
-                          │
-         ┌────────────────┴────────────────┐
-         │                                 │
-         ▼                                 ▼
+                                   Route 53
+                                        │
+                                        ▼
 
-   Frontend EC2                    Backend EC2
-(Apache + HTML/JS)             (Flask REST API)
-         │                                 │
-         │                                 ▼
-         │                       Secrets Manager
-         │                                 │
-         │                                 ▼
-         └──────────────► Amazon Aurora ◄──┘
-                            (MySQL)
+                         Application Load Balancer
+                                        │
+                  ┌─────────────────────┴─────────────────────┐
+                  │                                           │
+                  ▼                                           ▼
 
-                                 │
-                                 ▼
+           Frontend Tier                               Backend Tier
+        (Apache + HTML/JS)                         (Flask REST API)
+                  │                                           │
+                  │                                           ▼
+                  │                                  Secrets Manager
+                  │                                           │
+                  └───────────────► Aurora MySQL ◄────────────┘
+                                         │
+                                         ▼
 
-                           CloudWatch
-                                 │
-                                 ▼
+                                  CloudWatch Agent
+                                         │
+                                         ▼
 
-                             SNS Alerts
+                                     SNS Alerts
+
 ```
 
 This architecture separates presentation, application, and database layers while integrating monitoring, security, and DNS services. :contentReference[oaicite:1]{index=1}
@@ -164,19 +163,7 @@ This architecture separates presentation, application, and database layers while
 ## 🔄 Application Workflow
 
 ```text
-User Request
-      →
-Route 53 DNS Resolution
-      →
-Application Load Balancer
-      →
-Frontend Application
-      →
-Backend API
-      →
-Amazon Aurora Database
-      →
-Response to User
+User Request → Route 53 DNS Resolution → Application Load Balancer → Frontend Application → Backend API → Amazon Aurora Database → Response to User
 ```
 
 ---
@@ -184,13 +171,7 @@ Response to User
 ## 🌐 DNS & Load Balancing Workflow
 
 ```text
-Custom Domain
-      →
-Route 53
-      →
-Application Load Balancer
-      →
-Frontend EC2 / Backend EC2
+Custom Domain → Route 53 → Application Load Balancer → Frontend EC2 / Backend EC2
 ```
 
 Route 53 provides DNS routing while ALB distributes traffic across application components. :contentReference[oaicite:2]{index=2}
@@ -212,15 +193,7 @@ The project secures application traffic using AWS Certificate Manager and Applic
 ### HTTPS Workflow
 
 ```text
-Client Request
-      →
-HTTPS (443)
-      →
-ACM Certificate Validation
-      →
-Application Load Balancer
-      →
-Frontend / Backend Services
+Client Request → HTTPS (443) → ACM Certificate Validation → Application Load Balancer → Frontend / Backend Services
 ```
 
 The implementation uses ACM-issued certificates integrated with ALB listeners for secure communication. :contentReference[oaicite:3]{index=3}
@@ -241,15 +214,7 @@ AWS Secrets Manager is used to securely store database credentials instead of ha
 ### Secret Retrieval Flow
 
 ```text
-Backend EC2
-      →
-IAM Role Authentication
-      →
-Secrets Manager
-      →
-Database Credentials
-      →
-Aurora Connection
+Backend EC2 → IAM Role Authentication → Secrets Manager → Database Credentials → Aurora Connection
 ```
 
 This approach improves security and follows cloud security best practices. :contentReference[oaicite:4]{index=4}
@@ -270,13 +235,7 @@ CloudWatch provides centralized monitoring for backend infrastructure.
 ### Alert Workflow
 
 ```text
-CloudWatch Metrics
-         →
-Threshold Evaluation
-         →
-SNS Topic
-         →
-Email Notification
+CloudWatch Metrics → Threshold Evaluation → SNS Topic → Email Notification
 ```
 
 When CPU or memory thresholds exceed configured limits, SNS automatically sends notifications. :contentReference[oaicite:5]{index=5}
@@ -297,13 +256,7 @@ Amazon Aurora serves as the primary data layer for the application.
 ### Database Workflow
 
 ```text
-Frontend
-     →
-Backend API
-     →
-Aurora Database
-     →
-Persistent Storage
+Frontend → Backend API → Aurora Database → Persistent Storage
 ```
 
 Aurora provides managed relational database capabilities while supporting MySQL-compatible workloads. :contentReference[oaicite:6]{index=6}
